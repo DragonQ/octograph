@@ -524,6 +524,363 @@
         "x": 6,
         "y": 2
       },
+      "id": 20,
+      "interval": null,
+      "links": [],
+      "mappingType": 1,
+      "mappingTypes": [
+        {
+          "name": "value to text",
+          "value": 1
+        },
+        {
+          "name": "range to text",
+          "value": 2
+        }
+      ],
+      "maxDataPoints": 100,
+      "nullPointMode": "connected",
+      "nullText": null,
+      "postfix": "",
+      "postfixFontSize": "50%",
+      "prefix": "",
+      "prefixFontSize": "50%",
+      "rangeMaps": [
+        {
+          "from": "null",
+          "text": "N/A",
+          "to": "null"
+        }
+      ],
+      "sparkline": {
+        "fillColor": "rgba(31, 118, 189, 0.18)",
+        "full": false,
+        "lineColor": "rgb(31, 120, 193)",
+        "show": false
+      },
+      "tableColumn": "",
+      "targets": [
+        {
+          "groupBy": [
+            {
+              "params": [
+                "$__interval"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "none"
+              ],
+              "type": "fill"
+            }
+          ],
+          "measurement": "electricity",
+          "orderByTime": "ASC",
+          "policy": "default",
+          "query": "from(bucket: \"energy\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"electricity\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"tracker_cost\")\r\n  |> keep(columns:[\"_value\"])\r\n  |> sum()\r\n  |> map(fn: (r) => ({\r\n      _value: r._value / 100.0\r\n    })\r\n  )",
+          "rawQuery": true,
+          "refId": "A",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "cost"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "sum"
+              }
+            ]
+          ],
+          "tags": []
+        }
+      ],
+      "thresholds": "",
+      "title": "Tracker cost (units only)",
+      "type": "singlestat",
+      "valueFontSize": "80%",
+      "valueMaps": [
+        {
+          "op": "=",
+          "text": "N/A",
+          "value": "null"
+        }
+      ],
+      "valueName": "total"
+    },
+    {
+      "cacheTimeout": null,
+      "colorBackground": false,
+      "colorValue": false,
+      "colors": [
+        "#299c46",
+        "rgba(237, 129, 40, 0.89)",
+        "#d44a3a"
+      ],
+      "datasource": "octograph-test",
+      "decimals": 2,
+      "fieldConfig": {
+        "defaults": {
+          "custom": {}
+        },
+        "overrides": []
+      },
+      "format": "currencyGBP",
+      "gauge": {
+        "maxValue": 100,
+        "minValue": 0,
+        "show": false,
+        "thresholdLabels": false,
+        "thresholdMarkers": true
+      },
+      "gridPos": {
+        "h": 2,
+        "w": 6,
+        "x": 12,
+        "y": 2
+      },
+      "id": 21,
+      "interval": null,
+      "links": [],
+      "mappingType": 1,
+      "mappingTypes": [
+        {
+          "name": "value to text",
+          "value": 1
+        },
+        {
+          "name": "range to text",
+          "value": 2
+        }
+      ],
+      "maxDataPoints": 100,
+      "nullPointMode": "connected",
+      "nullText": null,
+      "postfix": "",
+      "postfixFontSize": "50%",
+      "prefix": "",
+      "prefixFontSize": "50%",
+      "rangeMaps": [
+        {
+          "from": "null",
+          "text": "N/A",
+          "to": "null"
+        }
+      ],
+      "sparkline": {
+        "fillColor": "rgba(31, 118, 189, 0.18)",
+        "full": false,
+        "lineColor": "rgb(31, 120, 193)",
+        "show": false
+      },
+      "tableColumn": "",
+      "targets": [
+        {
+          "groupBy": [
+            {
+              "params": [
+                "$__interval"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "none"
+              ],
+              "type": "fill"
+            }
+          ],
+          "measurement": "electricity",
+          "orderByTime": "ASC",
+          "policy": "default",
+          "query": "from(bucket: \"energy\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"electricity\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"tracker_total_cost\")\r\n  |> keep(columns:[\"_value\"])\r\n  |> sum()\r\n  |> map(fn: (r) => ({\r\n      _value: r._value / 100.0\r\n    })\r\n  )",
+          "rawQuery": true,
+          "refId": "A",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "cost"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "sum"
+              }
+            ]
+          ],
+          "tags": []
+        }
+      ],
+      "thresholds": "",
+      "title": "Tracker cost (total)",
+      "type": "singlestat",
+      "valueFontSize": "80%",
+      "valueMaps": [
+        {
+          "op": "=",
+          "text": "N/A",
+          "value": "null"
+        }
+      ],
+      "valueName": "total"
+    },
+    {
+      "cacheTimeout": null,
+      "colorBackground": false,
+      "colorValue": false,
+      "colors": [
+        "#299c46",
+        "rgba(237, 129, 40, 0.89)",
+        "#d44a3a"
+      ],
+      "datasource": "octograph-test",
+      "decimals": 4,
+      "fieldConfig": {
+        "defaults": {
+          "custom": {}
+        },
+        "overrides": []
+      },
+      "format": "currencyGBP",
+      "gauge": {
+        "maxValue": 100,
+        "minValue": 0,
+        "show": false,
+        "thresholdLabels": false,
+        "thresholdMarkers": true
+      },
+      "gridPos": {
+        "h": 2,
+        "w": 6,
+        "x": 18,
+        "y": 2
+      },
+      "id": 22,
+      "interval": null,
+      "links": [],
+      "mappingType": 1,
+      "mappingTypes": [
+        {
+          "name": "value to text",
+          "value": 1
+        },
+        {
+          "name": "range to text",
+          "value": 2
+        }
+      ],
+      "maxDataPoints": 100,
+      "nullPointMode": "connected",
+      "nullText": null,
+      "postfix": "",
+      "postfixFontSize": "50%",
+      "prefix": "",
+      "prefixFontSize": "50%",
+      "rangeMaps": [
+        {
+          "from": "null",
+          "text": "N/A",
+          "to": "null"
+        }
+      ],
+      "sparkline": {
+        "fillColor": "rgba(31, 118, 189, 0.18)",
+        "full": false,
+        "lineColor": "rgb(31, 120, 193)",
+        "show": false
+      },
+      "tableColumn": "",
+      "targets": [
+        {
+          "groupBy": [
+            {
+              "params": [
+                "$__interval"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "none"
+              ],
+              "type": "fill"
+            }
+          ],
+          "measurement": "electricity",
+          "orderByTime": "ASC",
+          "policy": "default",
+          "query": "consumption = from(bucket: \"energy\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"electricity\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"consumption\")\r\n  |> keep(columns:[\"_start\",\"_value\"])\r\n  |> sum()\r\n\r\ncost = from(bucket: \"energy\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"electricity\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"tracker_total_cost\")\r\n  |> keep(columns:[\"_start\",\"_value\"])\r\n  |> sum()\r\n\r\njoin(tables: {cost: cost, consumption: consumption}, on: [\"_start\"])\r\n  |> map(fn: (r) => ({_value: (r._value_cost / r._value_consumption) / 100.0 }))",
+          "rawQuery": true,
+          "refId": "A",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "cost"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "sum"
+              }
+            ]
+          ],
+          "tags": []
+        }
+      ],
+      "thresholds": "",
+      "title": "Tracker effective unit cost",
+      "type": "singlestat",
+      "valueFontSize": "80%",
+      "valueMaps": [
+        {
+          "op": "=",
+          "text": "N/A",
+          "value": "null"
+        }
+      ],
+      "valueName": "total"
+    },
+    {
+      "cacheTimeout": null,
+      "colorBackground": false,
+      "colorValue": false,
+      "colors": [
+        "#299c46",
+        "rgba(237, 129, 40, 0.89)",
+        "#d44a3a"
+      ],
+      "datasource": "octograph-test",
+      "decimals": 2,
+      "fieldConfig": {
+        "defaults": {
+          "custom": {}
+        },
+        "overrides": []
+      },
+      "format": "currencyGBP",
+      "gauge": {
+        "maxValue": 100,
+        "minValue": 0,
+        "show": false,
+        "thresholdLabels": false,
+        "thresholdMarkers": true
+      },
+      "gridPos": {
+        "h": 2,
+        "w": 6,
+        "x": 6,
+        "y": 4
+      },
       "id": 17,
       "interval": null,
       "links": [],
@@ -641,7 +998,7 @@
         "h": 2,
         "w": 6,
         "x": 12,
-        "y": 2
+        "y": 4
       },
       "id": 18,
       "interval": null,
@@ -760,7 +1117,7 @@
         "h": 2,
         "w": 6,
         "x": 18,
-        "y": 2
+        "y": 4
       },
       "id": 19,
       "interval": null,
@@ -865,10 +1222,10 @@
       "fill": 1,
       "fillGradient": 0,
       "gridPos": {
-        "h": 9,
+        "h": 8,
         "w": 24,
         "x": 0,
-        "y": 4
+        "y": 6
       },
       "hiddenSeries": false,
       "id": 2,
@@ -886,6 +1243,7 @@
       "lines": true,
       "linewidth": 1,
       "links": [],
+      "maxDataPoints": null,
       "nullPointMode": "null",
       "options": {
         "alertThreshold": true
@@ -912,6 +1270,14 @@
         },
         {
           "alias": "cost",
+          "yaxis": 2
+        },
+        {
+          "alias": "flexible_cost",
+          "yaxis": 2
+        },
+        {
+          "alias": "tracker_cost",
           "yaxis": 2
         }
       ],
@@ -978,7 +1344,7 @@
           "measurement": "electricity",
           "orderByTime": "ASC",
           "policy": "default",
-          "query": "from(bucket: \"energy\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"electricity\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"agile_cost\" or r[\"_field\"] == \"cost\")\r\n  |> keep(columns:[\"_value\", \"_time\", \"_field\"])\r\n  |> map(fn: (r) => ({\r\n      _value: r._value / 100.0,\r\n      _time: r._time,\r\n      _field: r._field\r\n    })\r\n  )\r\n  |> aggregateWindow(every: 30m, fn: mean)",
+          "query": "from(bucket: \"energy\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"electricity\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"agile_cost\" or r[\"_field\"] == \"cost\" or r[\"_field\"] == \"tracker_cost\")\r\n  |> keep(columns:[\"_value\", \"_time\", \"_field\"])\r\n  |> map(fn: (r) => ({\r\n      _value: r._value / 100.0,\r\n      _time: r._time,\r\n      _field: r._field\r\n    })\r\n  )\r\n  |> aggregateWindow(every: 30m, fn: mean)",
           "rawQuery": true,
           "refId": "B",
           "resultFormat": "time_series",
@@ -1071,7 +1437,7 @@
         "h": 2,
         "w": 6,
         "x": 0,
-        "y": 13
+        "y": 14
       },
       "id": 7,
       "interval": null,
@@ -1190,7 +1556,7 @@
         "h": 2,
         "w": 6,
         "x": 6,
-        "y": 13
+        "y": 14
       },
       "id": 11,
       "interval": null,
@@ -1309,7 +1675,7 @@
         "h": 2,
         "w": 6,
         "x": 12,
-        "y": 13
+        "y": 14
       },
       "id": 13,
       "interval": null,
@@ -1428,7 +1794,7 @@
         "h": 2,
         "w": 6,
         "x": 18,
-        "y": 13
+        "y": 14
       },
       "id": 15,
       "interval": null,
@@ -1533,10 +1899,10 @@
       "fill": 1,
       "fillGradient": 0,
       "gridPos": {
-        "h": 9,
+        "h": 7,
         "w": 24,
         "x": 0,
-        "y": 15
+        "y": 16
       },
       "hiddenSeries": false,
       "id": 8,
@@ -1711,8 +2077,8 @@
     "list": []
   },
   "time": {
-    "from": "2021-01-01T00:00:00.000Z",
-    "to": "2021-03-07T23:59:59.000Z"
+    "from": "now-7d",
+    "to": "now"
   },
   "timepicker": {
     "refresh_intervals": [
@@ -1742,5 +2108,5 @@
   "timezone": "",
   "title": "Energy usage",
   "uid": "7Nqpoj-ik",
-  "version": 5
+  "version": 8
 }

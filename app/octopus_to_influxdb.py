@@ -32,6 +32,14 @@ def retrieve_paginated_data(
         )
     return results
 
+def retrieve_tracker_data(
+        api_key, url, from_date, to_date
+):
+    response = requests.get(url, auth=(api_key, ''))
+    response.raise_for_status()
+    data = response.json()
+    results = data.get('periods', [])
+    return results
 
 def store_series(connection, version, org, bucket, series, metrics, rate_data):
 
@@ -39,6 +47,11 @@ def store_series(connection, version, org, bucket, series, metrics, rate_data):
     agile_rates = {
         point['valid_to']: point['value_inc_vat']
         for point in agile_data
+    }
+    tracker_data = rate_data.get('tracker_unit_rates', [])
+    tracker_rates = {
+        point['date']: point['unit_rate']
+        for point in tracker_data
     }
 
     def active_rate_field(measurement):
@@ -114,6 +127,18 @@ def store_series(connection, version, org, bucket, series, metrics, rate_data):
                 'agile_cost': agile_cost,
                 'agile_total_cost': agile_cost + agile_standing_charge,
             })
+        if tracker_data:
+            tracker_standing_charge = rate_data['tracker_standing_charge'] / 48
+            tracker_unit_rate = tracker_rates.get(
+                maya.parse(measurement['interval_end']).iso8601().split('T')[0],
+                rate_data[rate]  # cludge, use Go rate during DST changeover
+            )
+            tracker_cost = tracker_unit_rate * consumption
+            fields.update({
+                'tracker_rate': tracker_unit_rate,
+                'tracker_cost': tracker_cost,
+                'tracker_total_cost': tracker_cost + tracker_standing_charge,
+            })
         return fields
 
     def tags_for_measurement(measurement):
@@ -185,6 +210,7 @@ def cmd(config_file, from_date, to_date):
     e_url = 'https://api.octopus.energy/v1/electricity-meter-points/' \
             f'{e_mpan}/meters/{e_serial}/consumption/'
     agile_url = config.get('electricity', 'agile_rate_url', fallback=None)
+    tracker_url = config.get('electricity', 'tracker_rate_url', fallback=None)
 
     g_mpan = config.get('gas', 'mpan', fallback=None)
     g_serial = config.get('gas', 'serial_number', fallback=None)
@@ -220,6 +246,10 @@ def cmd(config_file, from_date, to_date):
                 'electricity', 'agile_standing_charge', fallback=0.0
             ),
             'agile_unit_rates': [],
+            'tracker_standing_charge': config.getfloat(
+                'electricity', 'tracker_standing_charge', fallback=0.0
+            ),
+            'tracker_unit_rates': [],
         },
         'gas': {
             'standing_charge': config.getfloat(
@@ -250,6 +280,14 @@ def cmd(config_file, from_date, to_date):
         api_key, agile_url, from_iso, to_iso
     )
     click.echo(f' {len(rate_data["electricity"]["agile_unit_rates"])} rates.')
+    click.echo(
+        f'Retrieving Tracker rates for {from_iso} until {to_iso}...',
+        nl=False
+    )
+    rate_data['electricity']['tracker_unit_rates'] = retrieve_tracker_data(
+        api_key, tracker_url, from_iso, to_iso
+    )
+    click.echo(f' {len(rate_data["electricity"]["tracker_unit_rates"])} rates.')
     store_series(write_api, influx_version, org, database, 'electricity', e_consumption, rate_data['electricity'])
 
     click.echo(
