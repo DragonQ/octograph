@@ -118,7 +118,7 @@ def store_series(connection, version, org, bucket, series, metrics, rate_data):
         if agile_data:
             agile_standing_charge = rate_data['agile_standing_charge'] / 48
             agile_unit_rate = agile_rates.get(
-                maya.parse(measurement['interval_end']).iso8601(),
+                maya.parse(measurement['interval_start']).iso8601(),
                 rate_data[rate]  # cludge, use Go rate during DST changeover
             )
             agile_cost = agile_unit_rate * consumption
@@ -130,7 +130,7 @@ def store_series(connection, version, org, bucket, series, metrics, rate_data):
         if tracker_data:
             tracker_standing_charge = rate_data['tracker_standing_charge'] / 48
             tracker_unit_rate = tracker_rates.get(
-                maya.parse(measurement['interval_end']).iso8601().split('T')[0],
+                maya.parse(measurement['interval_start']).iso8601().split('T')[0],
                 rate_data[rate]  # cludge, use Go rate during DST changeover
             )
             tracker_cost = tracker_unit_rate * consumption
@@ -142,7 +142,7 @@ def store_series(connection, version, org, bucket, series, metrics, rate_data):
         return fields
 
     def tags_for_measurement(measurement):
-        period = maya.parse(measurement['interval_end'])
+        period = maya.parse(measurement['interval_start'])
         time = period.datetime().strftime('%H:%M')
         return {
             'active_rate': active_rate_field(measurement),
@@ -153,7 +153,7 @@ def store_series(connection, version, org, bucket, series, metrics, rate_data):
         {
             'measurement': series,
             'tags': tags_for_measurement(measurement),
-            'time': measurement['interval_end'],
+            'time': measurement['interval_start'],
             'fields': fields_for_measurement(measurement),
         }
         for measurement in metrics
