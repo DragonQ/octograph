@@ -143,7 +143,7 @@ def store_series(connection, version, org, bucket, series, metrics, rate_data):
 
     def tags_for_measurement(measurement):
         period = maya.parse(measurement['interval_start'])
-        time = period.datetime().strftime('%H:%M')
+        time = period.datetime(to_timezone='Europe/London').strftime('%H:%M')
         return {
             'active_rate': active_rate_field(measurement),
             'time_of_day': time,
