@@ -57,6 +57,8 @@ def store_series(connection, version, org, bucket, series, metrics, rate_data):
     def active_rate_field(measurement):
         if series == 'gas':
             return 'unit_rate'
+        elif series == 'export':
+            return 'unit_rate'
         elif not rate_data['unit_rate_low_zone']:  # no low rate
             return 'unit_rate_high'
 
@@ -212,6 +214,13 @@ def cmd(config_file, from_date, to_date):
     agile_url = config.get('electricity', 'agile_rate_url', fallback=None)
     tracker_url = config.get('electricity', 'tracker_rate_url', fallback=None)
 
+    ex_mpan = config.get('export', 'mpan', fallback=None)
+    ex_serial = config.get('export', 'serial_number', fallback=None)
+    if not ex_mpan or not ex_serial:
+        raise click.ClickException('No export meter identifiers')
+    ex_url = 'https://api.octopus.energy/v1/electricity-meter-points/' \
+            f'{ex_mpan}/meters/{ex_serial}/consumption/'
+
     g_mpan = config.get('gas', 'mpan', fallback=None)
     g_serial = config.get('gas', 'serial_number', fallback=None)
     g_meter_type = config.get('gas', 'meter_type', fallback=1)
@@ -251,6 +260,14 @@ def cmd(config_file, from_date, to_date):
             ),
             'tracker_unit_rates': [],
         },
+        'export' : {
+            'standing_charge': config.getfloat(
+                'electricity', 'standing_charge', fallback=0.0
+            ),
+            'unit_rate': config.getfloat(
+                'export', 'unit_rate', fallback=0.0
+            ),
+        },
         'gas': {
             'standing_charge': config.getfloat(
                 'gas', 'standing_charge', fallback=0.0
@@ -289,6 +306,16 @@ def cmd(config_file, from_date, to_date):
     )
     click.echo(f' {len(rate_data["electricity"]["tracker_unit_rates"])} rates.')
     store_series(write_api, influx_version, org, database, 'electricity', e_consumption, rate_data['electricity'])
+
+    click.echo(
+        f'Retrieving export data for {from_iso} until {to_iso}...',
+        nl=False
+    )
+    ex_consumption = retrieve_paginated_data(
+        api_key, ex_url, from_iso, to_iso
+    )
+    click.echo(f' {len(ex_consumption)} readings.')
+    store_series(write_api, influx_version, org, database, 'export', ex_consumption, rate_data['export'])
 
     click.echo(
         f'Retrieving gas data for {from_iso} until {to_iso}...',
