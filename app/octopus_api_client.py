@@ -7,7 +7,15 @@ from urllib.parse import urlencode
 
 import click
 import requests
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
 
+
+class LoggingRetry(Retry):
+    def increment(self, *args, **kwargs):
+        reason = kwargs.get('error', None)
+        click.echo(f"Retrying request due to: {reason}")
+        return super().increment(*args, **kwargs)
 
 class OctopusApiClient:
     def __init__(self, api_prefix, api_key, resolution_minutes=30, cache_dir=None):
@@ -39,6 +47,21 @@ class OctopusApiClient:
         filename = re.sub('[^0-9A-Za-z-]', '_', url_with_params)
         return filename
 
+    @staticmethod
+    def _get_session_with_retries():
+        session = requests.Session()
+        retries = LoggingRetry(
+            total=4,
+            backoff_factor=2,
+            status_forcelist=[500, 502, 503, 504],
+            allowed_methods=["GET"],
+            raise_on_status=False,
+        )
+        adapter = HTTPAdapter(max_retries=retries)
+        session.mount("http://", adapter)
+        session.mount("https://", adapter)
+        return session
+
     def _retrieve_data(self, path: str, args: dict[str, str] = MappingProxyType({})):
         if path.startswith(self._api_prefix):
             url = path
@@ -54,7 +77,8 @@ class OctopusApiClient:
                     cached_data = json.load(file)
                 return cached_data
 
-        response = requests.get(url, params=args, auth=(self._api_key, ''))
+        session = self._get_session_with_retries()
+        response = session.get(url, params=args, auth=(self._api_key, ''), timeout=15)
         response.raise_for_status()
         json_data = response.json()
         if self._cache_dir:
