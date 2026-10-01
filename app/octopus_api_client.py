@@ -63,7 +63,7 @@ class OctopusApiClient:
         return session
 
     def _retrieve_data(self, path: str, args: dict[str, str] = MappingProxyType({})):
-        if path.startswith(self._api_prefix):
+        if path.startswith(self._api_prefix) or path.startswith("https://api.octopus.energy/v1"):
             url = path
         else:
             url = f'{self._api_prefix}/{path}'
