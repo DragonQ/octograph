@@ -261,6 +261,17 @@ class OctopusToInflux:
     def _process_gmp(self, gmp, collect_from: datetime, collect_to: datetime, base_tags: dict[str, str]):
         tags = base_tags.copy()
         click.echo(f'Processing gas meter point: {gmp["mprn"]}')
+
+        meters_to_check = 0
+        for gm in gmp['meters']:
+            if not self._included_meters or gm['serial_number'] in self._included_meters:
+                meters_to_check += 1
+                continue
+
+        if meters_to_check == 0:
+            click.echo(f'No gas meters to check in octopus.included_meters, skipping')
+            return
+
         if 'gas_mprn' in self._included_tags:
             tags['gas_mprn'] = gmp["mprn"]
 
